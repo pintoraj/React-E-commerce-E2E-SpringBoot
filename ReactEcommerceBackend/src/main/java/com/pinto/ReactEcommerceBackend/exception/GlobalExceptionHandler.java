@@ -1,6 +1,5 @@
 package com.pinto.ReactEcommerceBackend.exception;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,27 +12,29 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<Map<String,Object>> handleResourceNotFoundException(ResourceNotFoundException excep, WebRequest request){
-		Map<String,Object> body = new HashMap<>();
-		body.put("Timestamp", Instant.now());
-		body.put("Status",HttpStatus.NOT_FOUND.value());
-		body.put("Message",excep.getMessage());
-		body.put("Path", request.getDescription(false).replace("uri=", ""));
-		return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-	}
-	
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<Map<String,Object>> handleGlobalException(ResourceNotFoundException excep, WebRequest request){
-		
-		Map<String,Object> body=new HashMap<>();
-		body.put("Timestamp", Instant.now());
-		body.put("Status", HttpStatus.NOT_FOUND.value());
-		body.put("Message", excep.getMessage());
-		body.put("Path", request.getDescription(false).replace("uri=",""));
-		
-		return new ResponseEntity<>(body,HttpStatus.NOT_FOUND);
-	}
-	
-	
+    // Handle ResourceNotFoundException
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(
+            ResourceNotFoundException ex,
+            WebRequest request) {  // make sure import is correct
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        body.put("status", HttpStatus.NOT_FOUND.value());
+
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    // Handle all other exceptions
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGlobalException(
+            Exception ex,
+            WebRequest request) {
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
